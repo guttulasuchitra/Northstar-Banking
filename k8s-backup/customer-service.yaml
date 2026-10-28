@@ -1,0 +1,40 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-service
+  namespace: northstar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customer-service
+  template:
+    metadata:
+      labels:
+        app: customer-service
+    spec:
+      containers:
+        - name: customer-service
+          image: northstar-banking-customer-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: EUREKA_URL
+              value: "http://eureka-server:8761/eureka/"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customer-service
+  namespace: northstar
+spec:
+  selector:
+    app: customer-service
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+      nodePort: 30081
+  type: NodePort

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o k8s-generated/
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: account-service
+  name: account-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: account-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o k8s-generated/
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: account-service
+    spec:
+      containers:
+        - env:
+            - name: EUREKA_URL
+              value: http://eureka-server:8761/eureka/
+          image: account-service
+          name: account-service
+          ports:
+            - containerPort: 8082
+              protocol: TCP
+      restartPolicy: Always

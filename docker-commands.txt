@@ -1,0 +1,130 @@
+Dockerfile: Image ela build cheyyalo instructions.
+
+
+
+Image: Application run cheyadaniki required packaged template.
+
+
+
+Container: Image nunchi create chesina runnable instance.
+
+
+
+Network: Containers okadanitho okati communicate avvadaniki.
+
+
+
+Volume: Container remove chesina kuda data persist cheyadaniki.
+
+
+
+
+Docker Compose: Multiple services ni oka YAML file lo define chesi manage cheyadaniki.
+
+
+
+Docker installation and environment commands
+
+
+Command	Meaning / purpose
+docker --version	Docker CLI version check
+docker compose version	Compose version check
+docker info	Docker Engine, storage, containers, images, resource details
+docker ps	Running containers only
+docker ps -a	Running, stopped, and created containers
+docker images	Local Docker images
+docker volume ls	Docker volumes
+docker network ls	Docker networks
+
+Spring Boot code nunchi JAR build cheyyadam
+
+mvnw.cmd clean package -DskipTests
+
+
+Image build command
+
+docker build -t northstar/customer-service ./customer-service
+
+docker images
+
+
+Docker volumes:
+
+docker volume create auth-data
+docker volume create customer-data
+docker volume create account-data
+
+docker volume ls
+
+docker volume inspect customer-data
+
+Volume ni container ki attach cheyyadam
+
+docker run -d --name customer-service -v customer-data:/data northstar/customer-service
+
+Docker network:
+
+docker network create bank-network
+docker network ls
+docker network inspect bank-network
+
+docker run -d --name eureka-server --network bank-network -p 8761:8761 northstar/eureka-server
+
+docker run:
+
+docker run -d --name eureka-server --network bank-network -p 8761:8761 northstar/eureka-server
+
+
+docker run	Image nunchi container create chesi start cheyyadam
+-d	Background lo run cheyyadam
+--name eureka-server	Container ki readable name ivvadam
+--network bank-network	Container ni selected Docker network lo connect cheyyadam
+-p 8761:8761	Host port 8761 ni container port 8761 ki map cheyyadam
+northstar/eureka-server	Run cheyyalsina image name
+
+docker run vs docker start
+- docker run — image nunchi new container create chesi start chesthundi.
+- docker start eureka-server — already-created stopped container ni start chesthundi.
+- docker stop eureka-server — running container stop chesthundi.
+- docker rm eureka-server — stopped container remove chesthundi.
+- docker rm -f eureka-server — running or stopped container ni force ga remove chesthundi.
+docker ps -a
+docker logs eureka-server
+
+docker logs -f eureka-server
+
+Manual docker run:
+
+docker run -d --name customer-service --network bank-network -p 8081:8081 -v customer-data:/data -e EUREKA_URL=http://eureka-server:8761/eureka/ -e EUREKA_INSTANCE_PREFER_IP_ADDRESS=true -e SPRING_DATASOURCE_URL=jdbc:h2:file:/data/customerdb northstar/customer-service
+
+Manual method lo full lifecycle
+1. Maven tho five JARs build cheyyi.
+2. docker volume create tho required volumes create cheyyi.
+3. docker network create bank-network tho network create cheyyi.
+4. Five images build cheyyi.
+5. Eureka container first start cheyyi.
+6. Eureka ready ayyaka migilina four containers start cheyyi.
+7. docker ps and docker logs tho verify cheyyi.
+
+
+Compose YAML fields
+Field	Purpose
+services	Run cheyyalsina applications list
+build.context	Dockerfile build context directory
+image	Use cheyyalsina image name/tag, if configured
+container_name	Container ki explicit name
+ports	Host-to-container port mapping
+environment	Container environment variables
+volumes	Persistent storage or other mounts
+networks	Services connect ayye networks
+depends_on	Services startup order dependency
+restart	Container exit ayinappudu restart policy
+
+docker compose config
+docker compose build
+docker compose up -d
+docker compose ps
+docker compose logs -f customer-service
+docker compose stop
+docker compose start
+docker compose down
